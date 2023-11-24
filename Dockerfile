@@ -24,13 +24,15 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 ### COPYING ENTIRE DIR TO LOCAL DOCKER /wptagent
 COPY / /wptagent
-RUN apt-get update
+# wpt-private-instance: comment below line as it's redundant
+#RUN apt-get update
 
 # Git Clone Install
 # RUN apt-get install -y git
 # RUN git clone -b dockerfile https://github.com/sammeboy635/wptagent.git
 
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
+# wpt-private-instance: this script cannot install the node.js properly 
+# RUN curl -sL https://deb.nodesource.com/setup_20.x | bash -
 
 ### UPDATE ###
 RUN apt-get update 
@@ -43,7 +45,10 @@ RUN apt-get install -y \
     python3-dev libavutil-dev libmp3lame-dev libx264-dev yasm autoconf automake build-essential libass-dev libfreetype6-dev libtheora-dev \
     libtool libvorbis-dev pkg-config texi2html libtext-unidecode-perl python3-numpy python3-scipy perl \
     adb ethtool nodejs cmake git-core libsdl2-dev libva-dev libvdpau-dev libxcb1-dev libxcb-shm0-dev libxcb-xfixes0-dev texinfo wget \
-    ttf-mscorefonts-installer fonts-noto fonts-roboto fonts-open-sans ffmpeg npm
+    ttf-mscorefonts-installer fonts-noto fonts-roboto fonts-open-sans ffmpeg npm \
+    # wpt-pri-instance: add the missing libs (copied from master branch)
+    python3-psutil python3-xvfbwrapper python3-dnspython python3-monotonic python3-tornado python3-fonttools python3-wsaccel \
+    sudo curl xvfb libnss3 gnupg2 dnsmasq-base
 
 ### Update the font cache
 RUN fc-cache -f -v
@@ -53,6 +58,10 @@ RUN python3 -m pip install --upgrade --user pip && \
     python3 -m pip install --user -r /wptagent/.github/workflows/requirements.txt 
 
 ### INSTALLING LIGHTHOUSE FROM NPM ###
+# wpt-private-instance: install latest node
+RUN apt install -y npm nodejs \
+     && npm install n -g \
+     && n stable
 RUN npm install -g lighthouse
 
 ### INSTALLING CHROME BROWSER ###
